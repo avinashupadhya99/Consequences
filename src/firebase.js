@@ -3,14 +3,13 @@ import firebase from 'firebase';
 // const settings = {timestampsInSnapshots: true};
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDQD9ldZL7uTLKAeuGK45EtnFos6FOuCXQ",
-    authDomain: "campfire-50820.firebaseapp.com",
-    databaseURL: "https://campfire-50820.firebaseio.com",
-    projectId: "campfire-50820",
-    storageBucket: "campfire-50820.appspot.com",
-    messagingSenderId: "600176148545",
-    appId: "1:600176148545:web:2a6748fab783bfa6a386c0"
-  };
+  apiKey: "AIzaSyCh0Wa8oYk06qpYzxTX-rr1DjFV5tgT3PU",
+  authDomain: "consequences-37577.firebaseapp.com",
+  projectId: "consequences-37577",
+  storageBucket: "consequences-37577.appspot.com",
+  messagingSenderId: "17722906504",
+  appId: "1:17722906504:web:68610a39222b59b4c98c3d"
+};
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 

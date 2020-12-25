@@ -1,80 +1,95 @@
 /* .video{
-  height: 50%;
-  width: 50%;
+height: 50%;
+width: 50%;
 } */
 body{
-    font-family: 'Poiret One', cursive;
-    font-weight: bolder;
-    line-height: 2;
-  
-  }
-  .first-container{
-    background-color: #BFF0CF;
-  }
-  .Heading{
-    float: right;
-    font-family: 'Sacramento', cursive;
-    color: #045762;
-    /* font-size: 40px; */
-    text-align: center;
-  }
-  h1{
-    font-size: 150px;
-    margin-right:  7%;
-    margin-top: 10%;
-    margin-bottom: 10%;
-    text-shadow: 5px 4px #fff;
-    /* margin-left: %; */
-  }
-  h3{
-    font-size: 80px;
-    margin-right:  7%;
-    margin-top: 10%;
-    margin-bottom: 5%;
-    text-shadow: 5px 4px #fff;
-  
-  }
-  .intro-para{
-    font-size: 30px;
-    /* text-align: right; */
-  }
-  .img{
-    margin-left: 2%;
-  }
-  .content{
-    padding-left: 3%;
-    padding-top: 3%;
-    padding-bottom: 3%;
-  }
-  .navbar-nav{
-    margin-left: 850px;
-  }
-  .nav-item{
-    margin-left: 30%;
-    margin-right: 30%;
-  }
-  .second-container{
-    margin:5%;
-  
-  }
-  .third-container{
-      padding-left: 5%;
-      padding-bottom: 5%;
-      /* padding-top: 2%; */
-      background-color: #bbbbbb;
-  }
-  .form-group{
-    margin:3%;
-  }
-  label{
-    margin-left: 2%;
-  }
-  .btn{
-    /* position: absolute; */
-  }
+  font-family: 'Poiret One', cursive;
+  font-weight: bolder;
+  line-height: 2;
 
-  .sign-in-play {
-    position: absolute;
-    left: 45%;
+}
+.first-container{
+  background-color: #BFF0CF;
+}
+.Heading{
+  float: right;
+  font-family: 'Sacramento', cursive;
+  color: #045762;
+  /* font-size: 40px; */
+  text-align: center;
+}
+h1{
+  font-size: 150px;
+  margin-right:  7%;
+  margin-top: 10%;
+  margin-bottom: 10%;
+  text-shadow: 5px 4px #fff;
+  /* margin-left: %; */
+}
+h3{
+  font-size: 80px;
+  margin-right:  7%;
+  
+  margin-bottom: 5%;
+  text-shadow: 5px 4px #fff;
 
-  }
+}
+.intro-para{
+  font-size: 30px;
+  /* text-align: right; */
+}
+.img{
+  margin-left: 2%;
+}
+.content{
+  padding-left: 3%;
+  padding-top: 3%;
+  padding-bottom: 3%;
+}
+.navbar-nav{
+  margin-left: 850px;
+}
+.nav-item{
+  margin-left: 30%;
+  margin-right: 30%;
+}
+.second-container{
+  margin:5%;
+
+}
+.third-container{
+    padding-left: 5%;
+    padding-bottom: 5%;
+    /* padding-top: 2%; */
+    background-color: #bbbbbb;
+}
+.form-group{
+  margin:3%;
+}
+label{
+  margin-left: 2%;
+}
+.btn{
+  /* position: absolute; */
+}
+
+.sign-in-play {
+  position: absolute;
+  left: 45%;
+
+}
+
+.alert-container {
+  text-align: center;
+}
+
+.header-alert {
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.accept-requests {
+  margin-left: 10%;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}

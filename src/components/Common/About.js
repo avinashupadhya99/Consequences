@@ -2,7 +2,7 @@
 
 function About() {
     return (
-        <div class="second-container" id="about">
+        <div className="second-container" id="about">
             <h3 style={{textShadow: '5px 4px #bce6eb'}}>About</h3>
 
             <p>Consequences is an old parlour game in a similar vein to the Surrealist game exquisite corpse and Mad Libs.

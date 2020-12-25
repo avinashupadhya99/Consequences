@@ -2,7 +2,6 @@ import { Alert, Button, Form, Modal, Spinner } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import SignOut from '../Authentication/Signout'
 import Room from './Room';
 
 import { auth, db } from '../../firebase';
@@ -107,7 +106,6 @@ function Landing () {
             {error.show &&
                 <Alert className="vertical-center" variant="danger">{error.message}</Alert>
             }
-            <SignOut />
             <br/>
             <Button variant="warning" onClick={handleModalShow}>Join a Room</Button> OR <Button variant="warning" onClick={createRoom}>Create a room</Button>
 

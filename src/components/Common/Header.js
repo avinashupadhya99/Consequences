@@ -27,6 +27,7 @@ function Header () {
             console.log(result.user.uid);
             if(result.additionalUserInfo.isNewUser) {
                 db.collection("users").doc(result.user.uid).set({
+                    username: result.user.displayName,
                     roomID: null
                 })
             }
@@ -111,9 +112,10 @@ function Header () {
         .then((userDoc) => {
             console.log(userDoc);
             db.collection("rooms").add({
-                owner: user.uid,
+                owner: {uid: user.uid, displayName: user.displayName},
                 active: false,
-                joinRequests: []
+                joinRequests: [],
+                notifications: []
             })
             .then(function(roomDoc) {
                 console.log("Document written with ID: ", roomDoc.id);

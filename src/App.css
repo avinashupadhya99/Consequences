@@ -93,3 +93,24 @@ label{
   margin-top: 2%;
   margin-bottom: 2%;
 }
+
+.links:hover {
+  cursor: pointer;
+}
+
+.room-exit {
+  margin-right: 2%;
+  margin-top: 2%;
+}
+
+.users {
+  margin-left: 2%;
+  margin-top: 2%;
+}
+.user-list {
+  padding-top: 0px!important;
+}
+.user-icon {
+  color: gold;
+  margin-right: 1%;
+}

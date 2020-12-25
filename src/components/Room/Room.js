@@ -2,8 +2,15 @@ import Navbar from '../Common/Navbar';
 import { Redirect, withRouter } from "react-router-dom";
 import { auth, db } from "../../firebase";
 import { useState, useEffect } from "react";
-import { Button, Spinner } from 'react-bootstrap';
+import { Alert, Button, Spinner } from 'react-bootstrap';
 import { AiOutlineCheck,AiOutlineClose } from "react-icons/ai";
+import { FaCrown, FaDiscord } from "react-icons/fa";
+import { useHistory } from 'react-router-dom';
+
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 
 import { Error } from "../Common/Error";
 
@@ -12,10 +19,14 @@ import './room.css';
 function Room({ match }) {
     const [validity, setValidity] = useState({notLoaded:true});
     const [roomUser={notLoaded:true}, setRoomUser] = useState(null);
+    const [roomPlayer={notLoaded:true}, setRoomPlayer] = useState(null);
+    const [isRoomOwner, setIsRoomOwner] = useState(false);
     const [roomOwner, setRoomOwner] = useState(false);
     const [joinRequests, setJoinRequests] = useState([]);
+    const [roomNotifications, setRoomNotifications] = useState([]);
     const [error, setError] = useState(false);
 
+    const history = useHistory();
     
     useEffect(() => {
         auth.onAuthStateChanged(user=> {
@@ -27,9 +38,11 @@ function Room({ match }) {
                     db.collection("rooms").doc(match.params.id).get()
                     .then(roomDoc => {
                         console.log(roomDoc);
-                        setRoomOwner(roomDoc.data().owner === user.uid);
+                        setIsRoomOwner(roomDoc.data().owner.uid === user.uid);
+                        setRoomOwner(roomDoc.data().owner);
+                        console.log(roomDoc.data().owner);
                     }).catch(roomError => {
-
+                        console.error(roomError);
                     });
                     console.log(userDoc.data().roomID);
                 }).catch(error => {
@@ -44,8 +57,17 @@ function Room({ match }) {
             .onSnapshot(function(snapshot) {
                 console.log(snapshot.data().joinRequests);   
                 const joinRequestsSnapshot  = snapshot.data().joinRequests;
+                const notifications = snapshot.data().notifications;
+                const player = snapshot.data().player;
+                console.log(player);
                 if(joinRequestsSnapshot && joinRequestsSnapshot!==joinRequests) {
                     setJoinRequests(joinRequestsSnapshot);
+                }
+                if(notifications && notifications!==roomNotifications) {
+                    setRoomNotifications(notifications);
+                }
+                if(player!=roomPlayer) {
+                    setRoomPlayer(player);
                 }
             });
         })
@@ -72,7 +94,7 @@ function Room({ match }) {
     const acceptRequest = (user) => {
         db.collection("rooms").doc(match.params.id).update({
             joinRequests: [],
-            user: user.userid
+            player: user
         }, { merge: true })
         .then(() => {
             db.collection("users").doc(user.userid).update({
@@ -93,12 +115,36 @@ function Room({ match }) {
 
     };
 
+    const deleteRoom = () => {
+
+    };
+
+    const leaveRoom = () => {
+        db.collection("users").doc(roomUser.uid).update({
+            roomID: null
+
+        }, {merger: true})
+        .then(() => {
+            db.collection("rooms").doc(match.params.id).update({
+                player: null
+            }, {merge: true})
+            .then(() => {
+                history.push("/");
+            }).catch(roomErr => {
+                console.err(roomErr);
+            })
+        }).catch(err => {
+            console.error(err);
+        });
+        
+    };
+
     return(
         <>
             <div className="first-container">
                 <Navbar />
             </div>
-            {roomOwner &&
+            {isRoomOwner && joinRequests.length>0 &&
                 <div className="accept-requests">
                     <h5><b>Join requests</b></h5>
                     {joinRequests.map((joinRequest) => (
@@ -106,6 +152,38 @@ function Room({ match }) {
                     ))}
                 </div>
             }
+            <div className="users">
+                <h5><b>Users - </b></h5>
+                <List dense={false} className="user-list">
+                    <ListItem>
+                    <FaCrown className="user-icon" />{' '}
+                    <ListItemText
+                        primary={roomOwner.displayName}
+                    />
+                    </ListItem>
+                    {roomPlayer && 
+                        <ListItem>
+                            <FaDiscord className="user-icon" />{' '}
+                            <ListItemText
+                                primary={roomPlayer.username}
+                            />
+                        </ListItem>
+                    }
+                </List>
+            </div>
+            {isRoomOwner && 
+                <Button className="float-right room-exit" variant="danger" onClick={deleteRoom}>Delete Room</Button>
+            }
+            {!isRoomOwner && 
+                <Button className="float-right room-exit" variant="danger" onClick={leaveRoom}>Leave Room</Button>
+            }
+            <div className="notifications">
+                {roomNotifications.map((roomNotification) => (
+                    <Alert className="header-alert" variant="info" dismissible>
+                        {roomNotification}
+                    </Alert>
+                ))}
+            </div>
             <div className="third-container">
                 <h3>play</h3>
 

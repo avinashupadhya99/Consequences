@@ -37,31 +37,33 @@ function Header () {
             setAlertShow(true);
         });
     }
+
+    useEffect(() => {
+        auth.onAuthStateChanged(user => {
+            setUser(user);
+        });
+    }, []);
     
     useEffect(() => {
-        auth.onAuthStateChanged(function(user) {
-            if(user) {
-                setUser(user);
-                db.collection("users").doc(user.uid)
-                .onSnapshot(function(snapshot) {
-                    if(snapshot.exists) {
-                        const roomID = snapshot.data().roomID
-                        console.log(roomID);
-                        if(roomID) {
-                            const roomPath = `/rooms/${roomID}`;
-                            console.log(roomPath);
-                            history.push(roomPath);
-                        }
-                    } else {
-                        db.collection("users").doc(user.uid).set({
-                            roomID: null
-                        })
+        if(user) {
+            db.collection("users").doc(user.uid)
+            .onSnapshot(function(snapshot) {
+                if(snapshot.exists) {
+                    const roomID = snapshot.data().roomID
+                    console.log(roomID);
+                    if(roomID) {
+                        const roomPath = `/rooms/${roomID}`;
+                        console.log(roomPath);
+                        history.push(roomPath);
                     }
-                });
-            } else {
-
-            }
-        });
+                } else {
+                    // Create user collection if not exists
+                    db.collection("users").doc(user.uid).set({
+                        roomID: null
+                    })
+                }
+            });
+        }
     }, [user]);
 
     const join = (e) => {
@@ -76,11 +78,12 @@ function Header () {
                     console.log(roomPath);
                     history.push(roomPath);
                 } else {
-                    let roomJoinRequests = roomDoc.data().joinRequests;
-                    roomJoinRequests.push({userid: user.uid, username: user.displayName});
-                    db.collection("rooms").doc(room.roomcode).update({
-                        joinRequests: roomJoinRequests
-                    }, { merge: true })
+                    // let roomJoinRequests = roomDoc.data().joinRequests;
+                    // roomJoinRequests.push({userid: user.uid, username: user.displayName});
+                    db.collection("rooms").doc(room.roomcode).collection('joinRequests').doc(user.uid).set({
+                        userid: user.uid,
+                        username: user.displayName
+                    })
                     .then(() => {
                         setAlertData("Request sent to room owner. Please wait for the room owner to accept");
                         setAlertVariant('info');
@@ -114,7 +117,6 @@ function Header () {
             db.collection("rooms").add({
                 owner: {uid: user.uid, displayName: user.displayName},
                 active: false,
-                joinRequests: [],
                 notifications: []
             })
             .then(function(roomDoc) {
@@ -168,7 +170,6 @@ function Header () {
                     <div className="sign-in-play">
                         <Button onClick={handleJoinModalShow} variant="primary" size="lg">Join Room</Button>&nbsp;&nbsp;
                         <Button onClick={createRoom} variant="primary" size="lg">Create Room</Button>&nbsp;&nbsp;
-                        <Button variant="warning" size="lg"  onClick={() => auth.signOut()}>Sign out</Button>
                     </div>
                     : 
                     <GoogleButton className="sign-in-play" id="customBtn" onClick={signInWithGoogle} />}

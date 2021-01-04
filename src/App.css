@@ -1,41 +1,45 @@
-/* .video{
-height: 50%;
-width: 50%;
-} */
 body{
   font-family: 'Poiret One', cursive;
   font-weight: bolder;
   line-height: 2;
+    /* color: grey; */
 
 }
 .first-container{
   background-color: #BFF0CF;
+  color: grey;
 }
 .Heading{
   float: right;
-  font-family: 'Sacramento', cursive;
+  margin-right:  7%;
+  margin-top: 10%;
+  margin-bottom: 10%;
+
+  font-family: 'Gloria Hallelujah', cursive;
   color: #045762;
   /* font-size: 40px; */
   text-align: center;
 }
 h1{
-  font-size: 150px;
-  margin-right:  7%;
-  margin-top: 10%;
+  font-size: 80px;
   margin-bottom: 10%;
+  text-shadow: 5px 4px #fff;
+  /* margin-right:  7%;
+  margin-top: 10%;
+   margin-bottom: 10%;
   text-shadow: 5px 4px #fff;
   /* margin-left: %; */
 }
 h3{
   font-size: 80px;
   margin-right:  7%;
-  
+  margin-top: 10%;
   margin-bottom: 5%;
-  text-shadow: 5px 4px #fff;
+  text-shadow: 3px 3px #fff;
 
 }
 .intro-para{
-  font-size: 30px;
+  font-size: 20px;
   /* text-align: right; */
 }
 .img{
@@ -61,7 +65,7 @@ h3{
     padding-left: 5%;
     padding-bottom: 5%;
     /* padding-top: 2%; */
-    background-color: #bbbbbb;
+    background-image: linear-gradient(#f56a79,#ff414d,#821752);
 }
 .form-group{
   margin:3%;
@@ -113,4 +117,7 @@ label{
 .user-icon {
   color: gold;
   margin-right: 1%;
+}
+.copy-button:hover {
+  cursor: pointer;
 }

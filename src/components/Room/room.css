@@ -4,8 +4,6 @@
   z-index: 1031; /* High z-index so it is on top of the page */
   top: 50%;
   left: 40%; /* or: left: 50%; */
-  margin-top: -..px; /* half of the elements height */
-  margin-right: -..px; /* half of the elements widht */
 }
   
 html {

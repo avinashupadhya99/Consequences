@@ -12,15 +12,13 @@ function Navbar () {
 
     useEffect(() => {
         auth.onAuthStateChanged(function(user) {
-            if(user) {
-                setUser(user);
-            }
+            setUser(user);
         });
     }, [user]);
 
     return (
         <nav className="navbar navbar-expand-lg navbr-lg bg-light">
-            <a className="navbar-brand links" onClick={redirectToHome}>consequences</a>
+            <a className="navbar-brand links" href="/">consequences</a>
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav mr-auto">
                 <li className="nav-item active">
@@ -32,7 +30,7 @@ function Navbar () {
                 {user &&
                     <li className="nav-item">
                         <a className="nav-link links" onClick={() => {
-                            auth.signOut()
+                            auth.signOut();
                             history.push("/");
                         }}>Signout</a>
                     </li>

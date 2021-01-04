@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Alert, Button, Spinner } from 'react-bootstrap';
 import { AiOutlineCheck,AiOutlineClose } from "react-icons/ai";
 import { FaCrown, FaDiscord } from "react-icons/fa";
+import { MdContentCopy } from "react-icons/md";
 import { useHistory } from 'react-router-dom';
 
 import List from '@material-ui/core/List';
@@ -19,7 +20,7 @@ import './room.css';
 function Room({ match }) {
     const [validity, setValidity] = useState({notLoaded:true});
     const [roomUser={notLoaded:true}, setRoomUser] = useState(null);
-    const [roomPlayer={notLoaded:true}, setRoomPlayer] = useState(null);
+    const [roomPlayers, setRoomPlayers] = useState(null);
     const [isRoomOwner, setIsRoomOwner] = useState(false);
     const [roomOwner, setRoomOwner] = useState(false);
     const [joinRequests, setJoinRequests] = useState([]);
@@ -29,12 +30,23 @@ function Room({ match }) {
     const history = useHistory();
     
     useEffect(() => {
+        db.collection("rooms").doc(match.params.id).get()
+        .then(roomDocument => {
+            if(!roomDocument.exists) {
+                history.push("/");
+            }
+        }).catch(roomErr => {
+            console.error(roomErr);
+        });
         auth.onAuthStateChanged(user=> {
             setRoomUser(user);
             if(user) {
                 db.collection("users").doc(user.uid).get()
                 .then(userDoc => {
                     setValidity(userDoc.data().roomID === match.params.id);
+                    if(userDoc.data().roomID !== match.params.id) {
+                        history.push("/");
+                    }
                     db.collection("rooms").doc(match.params.id).get()
                     .then(roomDoc => {
                         console.log(roomDoc);
@@ -48,26 +60,32 @@ function Room({ match }) {
                 }).catch(error => {
                     console.error(error);
                     setError(true);
-                })
+                });
+                db.collection("users").doc(user.uid)
+                .onSnapshot(snapshot => {
+                    if(snapshot.data().roomID==null) {
+                        history.push("/");
+                    }
+                });
             } else {
-                console.log("no user");
                 setValidity(false);
+                history.push("/");
             }
-            db.collection("rooms").doc(match.params.id)
-            .onSnapshot(function(snapshot) {
-                console.log(snapshot.data().joinRequests);   
-                const joinRequestsSnapshot  = snapshot.data().joinRequests;
-                const notifications = snapshot.data().notifications;
-                const player = snapshot.data().player;
-                console.log(player);
-                if(joinRequestsSnapshot && joinRequestsSnapshot!==joinRequests) {
-                    setJoinRequests(joinRequestsSnapshot);
+
+            db.collection("rooms").doc(match.params.id).collection('joinRequests')
+            .onSnapshot(snapshot => {
+                console.log(snapshot.docs);
+                const newJoinRequests = snapshot.docs.map(doc => doc.data());
+                if(newJoinRequests!==joinRequests) {
+                    setJoinRequests(newJoinRequests);
                 }
-                if(notifications && notifications!==roomNotifications) {
-                    setRoomNotifications(notifications);
-                }
-                if(player!=roomPlayer) {
-                    setRoomPlayer(player);
+            });
+            db.collection("rooms").doc(match.params.id).collection('players')
+            .onSnapshot(snapshot => {
+                console.log(snapshot.docs);
+                const newPlayers = snapshot.docs.map(doc => doc.data());
+                if(newPlayers!==roomPlayers) {
+                    setRoomPlayers(newPlayers);
                 }
             });
         })
@@ -92,42 +110,68 @@ function Room({ match }) {
     // }
 
     const acceptRequest = (user) => {
-        db.collection("rooms").doc(match.params.id).update({
-            joinRequests: [],
-            player: user
-        }, { merge: true })
+        // TODO: Use promise.all to execute all queries at once
+        db.collection("rooms").doc(match.params.id).collection('joinRequests').doc(user.userid).delete()
         .then(() => {
-            db.collection("users").doc(user.userid).update({
-                roomID: match.params.id
-            }, { merge: true })
-            .then(() => {
-
-            }).catch(userErr => {
-                console.log(userErr);
-            });
+            db.collection("rooms").doc(match.params.id).collection('players').doc(user.userid).set({
+                userid: user.userid,
+                username: user.username
+            }).then(() => {
+                db.collection("users").doc(user.userid).update({
+                    roomID: match.params.id
+                }, { merge: true })
+                .then(() => {
+                    
+                }).catch(userErr => {
+                    console.log(userErr);
+                });
+            }).catch(playerAddError => {
+                console.error(playerAddError);
+            })
         })
         .catch((err) => {
             console.error(err);
-        })
+        });
     };
 
     const rejectRequest = (user) => {
-
+        db.collection("rooms").doc(match.params.id).collection('joinRequests').doc(user.userid).delete()
+        .then(() => {
+            // Inform the other of rejection ?  
+            console.log('deleted request');
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     };
 
-    const deleteRoom = () => {
-
+    const deleteRoom = async () => {
+        const queries = [];
+        roomPlayers.forEach(roomPlayer => {
+            queries.push(db.collection("users").doc(roomPlayer.userid).set({
+                            roomID: null
+                        }, {merge: true}));
+        });
+        queries.push(db.collection("users").doc(roomOwner.uid).set({
+            roomID: null
+        }, {merge: true}));
+        await Promise.all(queries);
+        db.collection("rooms").doc(match.params.id).delete()
+        .then(() => { 
+            console.log('deleted room');
+            history.push("/");
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     };
 
     const leaveRoom = () => {
         db.collection("users").doc(roomUser.uid).update({
             roomID: null
-
-        }, {merger: true})
+        }, {merge: true})
         .then(() => {
-            db.collection("rooms").doc(match.params.id).update({
-                player: null
-            }, {merge: true})
+            db.collection("rooms").doc(match.params.id).collection('players').doc(roomUser.uid).delete()
             .then(() => {
                 history.push("/");
             }).catch(roomErr => {
@@ -144,6 +188,7 @@ function Room({ match }) {
             <div className="first-container">
                 <Navbar />
             </div>
+            <h5 class="text-center"><b>Room Code -</b> {match.params.id} <MdContentCopy className="copy-button" onClick={() => {navigator.clipboard.writeText(match.params.id)}} /></h5>
             {isRoomOwner && joinRequests.length>0 &&
                 <div className="accept-requests">
                     <h5><b>Join requests</b></h5>
@@ -161,13 +206,15 @@ function Room({ match }) {
                         primary={roomOwner.displayName}
                     />
                     </ListItem>
-                    {roomPlayer && 
-                        <ListItem>
-                            <FaDiscord className="user-icon" />{' '}
-                            <ListItemText
-                                primary={roomPlayer.username}
-                            />
-                        </ListItem>
+                    {roomPlayers && 
+                        roomPlayers.map((roomPlayer) => (
+                            <ListItem key={roomPlayer.userid}>
+                                <FaDiscord className="user-icon" />{' '}
+                                <ListItemText
+                                    primary={roomPlayer.username}
+                                />
+                            </ListItem>
+                        ))
                     }
                 </List>
             </div>

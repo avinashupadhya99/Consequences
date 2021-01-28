@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import firebase, { auth, db } from '../../firebase.js';
+import { debounce } from '@material-ui/core';
 
 function Header () {
     const [user, setUser] = useState(null);
@@ -73,13 +74,15 @@ function Header () {
         .then((roomDoc) => {
             console.log(roomDoc.data());
             if(roomDoc.exists) {
-                if(roomDoc.data().owner===user.uid) {
+                if(roomDoc.data().started) {
+                    setAlertData("Game started in that room");
+                    setAlertVariant('danger');
+                    setAlertShow(true);
+                } else if(roomDoc.data().owner===user.uid) {
                     const roomPath = `/rooms/${roomDoc.id}`;
                     console.log(roomPath);
                     history.push(roomPath);
                 } else {
-                    // let roomJoinRequests = roomDoc.data().joinRequests;
-                    // roomJoinRequests.push({userid: user.uid, username: user.displayName});
                     db.collection("rooms").doc(room.roomcode).collection('joinRequests').doc(user.uid).set({
                         userid: user.uid,
                         username: user.displayName
@@ -111,16 +114,17 @@ function Header () {
     }
 
     const createRoom = () => {
-        db.collection("users").doc(user.uid).get()
-        .then((userDoc) => {
-            console.log(userDoc);
-            db.collection("rooms").add({
-                owner: {uid: user.uid, displayName: user.displayName},
-                active: false,
-                notifications: []
-            })
-            .then(function(roomDoc) {
-                console.log("Document written with ID: ", roomDoc.id);
+        db.collection("rooms").add({
+            owner: {userid: user.uid, username: user.displayName},
+            started: false,
+            notifications: []
+        })
+        .then(function(roomDoc) {
+            console.log("Document written with ID: ", roomDoc.id);
+            db.collection("rooms").doc(roomDoc.id).collection('players').doc(user.uid).set({
+                userid: user.uid,
+                username: user.displayName
+            }).then(() => {
                 db.collection("users").doc(user.uid).update({
                     roomID: roomDoc.id
                 }, { merge: true })
@@ -132,12 +136,13 @@ function Header () {
                 .catch((err) => {
                     console.error(err);
                 })
-            })
-            .catch(function(error) {
-                console.error("Error adding document: ", error);
+            }).catch(playerErr => {
+                console.error(playerErr);
             });
-        }).catch(userError => { 
-            console.error(userError);
+            
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
         });
     }
 

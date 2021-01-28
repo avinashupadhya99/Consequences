@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import GoogleButton from 'react-google-button';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
+// import { useAuthState } from 'react-firebase-hooks/auth';
 
 import firebase, { auth, db } from '../../firebase.js';
 

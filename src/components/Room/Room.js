@@ -10,10 +10,9 @@ import { useHistory } from 'react-router-dom';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import { Error } from "../Common/Error";
+// import { Error } from "../Common/Error";
 
 import './room.css';
 
@@ -24,7 +23,7 @@ function Room({ match }) {
     const [isRoomOwner, setIsRoomOwner] = useState(false);
     const [roomOwner, setRoomOwner] = useState(false);
     const [joinRequests, setJoinRequests] = useState([]);
-    const [roomNotifications, setRoomNotifications] = useState([]);
+    // const [roomNotifications, setRoomNotifications] = useState([]);
     const [error, setError] = useState(false);
 
     const history = useHistory();
@@ -224,13 +223,13 @@ function Room({ match }) {
             {!isRoomOwner && 
                 <Button className="float-right room-exit" variant="danger" onClick={leaveRoom}>Leave Room</Button>
             }
-            <div className="notifications">
+            {/* <div className="notifications">
                 {roomNotifications.map((roomNotification) => (
                     <Alert className="header-alert" variant="info" dismissible>
                         {roomNotification}
                     </Alert>
                 ))}
-            </div>
+            </div> */}
             <div className="third-container">
                 <h3>play</h3>
 
